@@ -5,6 +5,9 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 
 class Flat(models.Model):
+    class Meta:
+        verbose_name = 'Квартира'
+        verbose_name_plural = 'Квартиры'
     owner = models.CharField("ФИО владельца", max_length=200)
     owners_phonenumber = models.CharField("Номер владельца", max_length=20)
     owner_phone_pure = PhoneNumberField(
@@ -40,7 +43,7 @@ class Flat(models.Model):
         User,
         verbose_name="Кто лайкнул",
         blank=True,
-        related_name='liked_flats'
+        related_name='liked_flats',
     )
 
     def __str__(self):
@@ -48,6 +51,9 @@ class Flat(models.Model):
 
 
 class Complaint(models.Model):
+    class Meta:
+        verbose_name = 'Жалоба'
+        verbose_name_plural = 'Жалобы'
     user = models.ForeignKey(
         User, verbose_name='Кто жаловался', on_delete=models.CASCADE)
     flat = models.ForeignKey(
@@ -71,4 +77,4 @@ class Owner(models.Model):
         Flat, related_name='owners', verbose_name='квартиры в собственности')
 
     def __str__(self):
-        return self.full_name
+        return f'{self.full_name}'
