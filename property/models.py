@@ -5,9 +5,6 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 
 class Flat(models.Model):
-    class Meta:
-        verbose_name = 'Квартира'
-        verbose_name_plural = 'Квартиры'
     owner = models.CharField("ФИО владельца", max_length=200)
     owners_phonenumber = models.CharField("Номер владельца", max_length=20)
     owner_phone_pure = PhoneNumberField(
@@ -46,35 +43,45 @@ class Flat(models.Model):
         related_name='liked_flats',
     )
 
+    class Meta:
+        verbose_name = 'Квартира'
+        verbose_name_plural = 'Квартиры'
+
     def __str__(self):
         return f"{self.town}, {self.address} ({self.price}р.)"
 
 
 class Complaint(models.Model):
+    complainer = models.ForeignKey(
+        User, verbose_name='Кто жаловался',
+        related_name='complainers',
+        on_delete=models.CASCADE)
+    flat = models.ForeignKey(
+        Flat, verbose_name="Квартира на которую пожаловались",
+        related_name='flats',
+        on_delete=models.CASCADE)
+    text = models.TextField("Текст жалобы")
+
     class Meta:
         verbose_name = 'Жалоба'
         verbose_name_plural = 'Жалобы'
-    user = models.ForeignKey(
-        User, verbose_name='Кто жаловался', on_delete=models.CASCADE)
-    flat = models.ForeignKey(
-        Flat, verbose_name="Квартира на которую пожаловались", on_delete=models.CASCADE)
-    text = models.TextField("Текст жалобы")
 
     def __str__(self):
         return f"{self.user} - {self.flat.town}, {self.flat.address})"
 
 
 class Owner(models.Model):
-    class Meta:
-        verbose_name = 'владелец'
-        verbose_name_plural = 'владельцы'
-
     full_name = models.CharField('ФИО владельца', max_length=200)
     phone_number = models.CharField('номер телефона владельца', max_length=20)
     normalized_phone_number = PhoneNumberField(
         'нормализованный номер телефона владельца', blank=True)
     flats = models.ManyToManyField(
-        Flat, related_name='owners', verbose_name='квартиры в собственности')
+        Flat, related_name='owners', null=True,
+        verbose_name='квартиры в собственности')
+
+    class Meta:
+        verbose_name = 'владелец'
+        verbose_name_plural = 'владельцы'
 
     def __str__(self):
         return f'{self.full_name}'
